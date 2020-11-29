@@ -1,0 +1,88 @@
+.full-width-table {
+    width: 100%;
+  }
+  
+  .cart-table {
+    box-shadow: none;
+    text-align: center;
+    position: relative;
+  }
+  
+  th.mat-header-cell, td.mat-cell {
+    border: none;
+  }
+  
+  tr.mat-header-row {
+    height: 35px;
+  }
+  
+  th.mat-header-cell {
+    border-bottom: solid 1px rgba(0,0,0,.12);
+  }
+  
+   th.mat-header-cell:first-child {
+    padding-left: 18px;
+  }
+  
+  td.mat-cell:first-child  {
+    padding-left: 0;
+  }
+  
+  th.mat-header-cell:nth-child(3) {
+    padding-left: 12px;
+  }
+  
+  .mat-cell.mat-column-customColumn1,
+  .mat-header-cell.mat-column-customColumn1 {
+  padding-right: 0!important;
+  text-align: center;
+  }
+  
+  .mat-cell.mat-column-customColumn1 .material-icons{
+    font-size: 16px!important;
+    padding-top: 5px;
+    cursor: pointer;
+  }
+  
+  .mat-cell.mat-column-customColumn1 .material-icons:hover {
+    font-size: 20px!important;
+  }
+  
+  .total-price {
+    position: sticky;
+    height: 40px;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    background: #eeeeee; 
+    border-top: solid 1.5px rgba(0, 0, 0, 0.23);
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.7px;
+  }
+  
+  .total-price button {
+    float: right;
+  }
+  
+  .spacer {
+    flex: 1;
+  }
+  
+  .filter-order {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .filter-order .mat-icon {
+    color: #000000a8;
+  }
+  
+  .filter-order input {
+    padding: 0 0 7px 0;
+  }
+  

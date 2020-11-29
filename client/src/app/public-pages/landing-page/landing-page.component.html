@@ -1,0 +1,38 @@
+<section class="private-details">
+  <a class="startBTN" mat-button [routerLink]="'/shopping'">
+    <h3 *ngIf="openCart && role != 'admin'">Resume Shopping</h3>
+    <h3 *ngIf="!openCart && role != 'admin'">Start Shopping</h3>
+    <h3 *ngIf="role == 'admin'">Shopping Panel</h3>
+  </a>
+
+  <app-login *ngIf="!connect"></app-login>
+  <div *ngIf="connect && role == 'user'">
+    <h5>Notification:</h5>
+    <p *ngIf="!lastOrder && !openCart">
+      Welcome To Your First Shopping Experience
+    </p>
+    <div *ngIf="lastOrder && !openCart">
+      <p>Your Last Order Was At:</p>
+      <p>{{ lastOrder }}</p>
+    </div>
+    <div *ngIf="openCart">
+      <p>You Have An Open Cart from:</p>
+      <p>{{ cartDate }}</p>
+    </div>
+  </div>
+</section>
+
+<section>here will be app details</section>
+
+<section class="store-details">
+  <img
+    src="https://securecdn.pymnts.com/wp-content/uploads/2017/03/shutterstock_604474112.jpg"
+  />
+  <p>
+    Available products in our virtual store - <strong>{{ prodsAmount }}</strong>
+  </p>
+  <p>
+    Number of orders submitted in our store -
+    <strong>{{ ordersAmount }}</strong>
+  </p>
+</section>

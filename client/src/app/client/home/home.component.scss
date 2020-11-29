@@ -1,0 +1,24 @@
+.nav-wrapper {
+    height: calc(100vh - 37px);
+    display: flex;
+    flex-direction: column;
+}
+
+app-prods-nav {
+    height: 100%;
+}
+
+mat-sidenav-container {
+    margin-bottom: 0;
+}
+
+app-all-prods {
+    display: inline-flex;
+    flex-flow: wrap;
+    justify-content: space-around;
+    align-items: center;
+    align-content: center;
+    width: 99%;
+    margin: auto;
+    background: white!important;
+}

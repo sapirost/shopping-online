@@ -1,0 +1,17 @@
+<h5>please choose quantity</h5>
+<mat-form-field>
+  <input
+    matInput
+    type="number"
+    min="1"
+    max="10"
+    [(ngModel)]="data.amount"
+    autocomplete="off"
+  />
+</mat-form-field>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button (click)="addToMyCart(data.amount)" cdkFocusInitial>
+    Ok
+  </button>
+</div>

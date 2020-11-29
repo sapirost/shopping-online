@@ -1,0 +1,32 @@
+#addProductForm {
+    text-align: center;
+
+    .mat-dialog-actions {
+        justify-content: center;
+    }
+
+    .price-input {
+        width: 90px;
+    }
+
+    .price-input.ng-touched.ng-invalid span {
+        color: red;
+    }
+
+    .show-img {
+        height: 70px;
+        width: 60px;
+    }
+
+    .file-label {
+        margin-right: 15px;
+        color: #3f51b5;
+    }
+
+    .mat-mini-fab.mat-accent {
+        background-color: #3f51b5;
+        &:hover {
+            .mat-icon {text-shadow: 0 0 3px #ffffff5c;}
+        }
+    }
+}

@@ -1,0 +1,22 @@
+<div class="item" *ngFor="let p of allProds">
+  <h3>{{ p.name }}</h3>
+  <div class="img-wrap">
+    <img [src]="getImg(p.image)" />
+  </div>
+  <h5>$ {{ p.price }}</h5>
+  <button
+    class="add-btn"
+    mat-raised-button
+    (click)="openDialog(p._id)"
+    *ngIf="role != 'admin'"
+  >
+    ADD TO CART
+  </button>
+  <div class="btn-wrap" *ngIf="role == 'admin'">
+    <mat-icon class="edit-btn" (click)="editProduct(p._id)">edit</mat-icon>
+    <button class="delete-btn" mat-button (click)="delete(p._id)">
+      DELETE
+    </button>
+  </div>
+</div>
+<div *ngIf="allProds?.length == 0">no results</div>

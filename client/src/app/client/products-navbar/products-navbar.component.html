@@ -1,0 +1,93 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+    #drawer
+    class="sidenav"
+    fixedInViewport="false"
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="!(isHandset$ | async)"
+  >
+    <mat-toolbar>
+      <label *ngIf="role != 'admin'">My Cart</label>
+      <label *ngIf="role == 'admin'">Add/ Edit Product</label>
+    </mat-toolbar>
+
+    <app-cart-table
+      *ngIf="role != 'admin'"
+      class="sidenav-cart-table"
+    ></app-cart-table>
+
+    <app-edit-product *ngIf="role == 'admin'"></app-edit-product>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar color="primary" class="main-toolbar">
+      <button
+        *ngIf="role != 'admin'"
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()"
+      >
+        <mat-icon [matBadge]="cartBadge" matBadgeColor="warn"
+          >local_grocery_store</mat-icon
+        >
+      </button>
+
+      <button
+        *ngIf="role == 'admin'"
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()"
+        matTooltip="Add/ Edit Panel"
+        aria-label="Add/ Edit Panel"
+      >
+        <mat-icon>library_add</mat-icon>
+      </button>
+
+      <form [formGroup]="searchGroup">
+        <input
+          placeholder="searching product..."
+          formControlName="searchText"
+          class="search-input"
+        />
+      </form>
+
+      <span class="spacer"></span>
+
+      <span *ngIf="!(isHandset$ | async)">
+        <button
+          class="category-btn"
+          *ngFor="let c of allCategories"
+          [value]="c.name"
+          (click)="changeCat(c._id)"
+          mat-button
+        >
+          {{ c.name }}
+        </button>
+        <button class="category-btn" mat-button (click)="changeCat('all')">
+          ALL
+        </button>
+      </span>
+
+      <button mat-button *ngIf="isHandset$ | async" [matMenuTriggerFor]="menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <mat-menu #menu="matMenu">
+        <button
+          mat-menu-item
+          *ngFor="let c of allCategories"
+          [value]="c.name"
+          (click)="changeCat(c._id)"
+        >
+          {{ c.name }}
+        </button>
+        <button mat-menu-item (click)="changeCat('all')">ALL</button>
+      </mat-menu>
+    </mat-toolbar>
+
+    <ng-content></ng-content>
+  </mat-sidenav-content>
+</mat-sidenav-container>
