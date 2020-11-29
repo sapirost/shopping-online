@@ -9,10 +9,10 @@ export class AuthGuard implements CanActivate, CanLoad {
   constructor(private router: Router, private userService: UserService) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    const user = this.userService.getUserSubject();
+    const user = this.userService.getUser();
 
     if (!user || !user.connect) {
-      // this.router.navigateByUrl('/login');
+      this.router.navigateByUrl('/login');
 
       return false;
     }
@@ -21,11 +21,10 @@ export class AuthGuard implements CanActivate, CanLoad {
   }
 
   canLoad(): boolean {
-    console.log("🚀 ~ file: auth.guard.ts ~ line 34 ~ AuthGuard ~ canLoad ~ canLoad")
-    const user = this.userService.getUserSubject();
+    const user = this.userService.getUser();
 
     if (!user || !user.connect) {
-      // this.router.navigateByUrl('/login');
+      this.router.navigateByUrl('/login');
 
       return false;
     }

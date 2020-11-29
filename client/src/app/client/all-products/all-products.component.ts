@@ -10,7 +10,7 @@ import { UserService } from './../../services/user.service';
   styleUrls: ['./all-products.component.scss']
 })
 export class AllProductsComponent implements OnInit {
-  allProds: Array<any> | [] = [];
+  allProds: any[] | [] = [];
   amount = 1;
   role: string;
 
@@ -27,9 +27,12 @@ export class AllProductsComponent implements OnInit {
       this.allProds = data.products;
     });
 
-    this.userService.userSubjectOBS.subscribe(data => {
-      this.role = data.role;
-    });
+    const user = this.userService.getUser();
+    this.role = user && user.role;
+
+    // this.userService.userSubjectOBS.subscribe(data => {
+    //   this.role = data.role;
+    // });
 
     this.storeService.refreshProdsEm.subscribe(data => {
       this.allProds = data.products;
@@ -44,14 +47,14 @@ export class AllProductsComponent implements OnInit {
     return this.storeService.getProductImageLink(image);
   }
 
-  delete(id) {
+  deleteProduct(id) {
     this.storeService.deleteProduct(id).subscribe(response => {
       this.allProds = response.products;
     });
   }
 
   openDialog(prodID): void {
-    const dialogRef = this.dialog.open(AmountPopupComponent, {
+    this.dialog.open(AmountPopupComponent, {
       width: '250px',
       data: { amount: this.amount, productID: prodID }
     });

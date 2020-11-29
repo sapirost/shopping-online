@@ -15,8 +15,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private userService: UserService,
     private formBuilder: FormBuilder,
+    private router: Router,
     private snackBar: MatSnackBar,
-    private router: Router
   ) { }
 
   ngOnInit() {
@@ -28,25 +28,12 @@ export class LoginComponent implements OnInit {
 
   login() {
     this.userService.logUser(this.logGroup.value).subscribe(data => {
-      console.log("🚀 ~ file: login.component.ts ~ line 31 ~ LoginComponent ~ this.userService.logUser ~ data", data)
-      this.userService.userSubject.next(data);
-      this.userService.refreshUserEvnt.emit(data);
-      this.cleanForm();
+      this.userService.updateUser(data);
       this.router.navigateByUrl('/shopping');
     },
       err => {
-        if (err.error === 'Unauthorized') {
-          this.snackBar.open('user does not exist');
-        } else {
-          this.snackBar.open('something went wrong, please try again');
-        }
+        const errMessage = err.error === 'Unauthorized' ? 'user does not exist' : 'something went wrong, please try again';
+        this.snackBar.open(errMessage);
       });
-  }
-
-  cleanForm() {
-    this.logGroup = this.formBuilder.group({
-      usernameMail: ['', [Validators.required]],
-      password: ['', Validators.required]
-    });
   }
 }

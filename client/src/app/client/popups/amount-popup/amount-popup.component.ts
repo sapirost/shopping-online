@@ -16,14 +16,10 @@ export class AmountPopupComponent implements OnInit {
 
   ngOnInit() { }
 
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
   addToMyCart(amount) {
     this.userService.addToUserCart(this.data.productID, amount).subscribe(response => {
-      this.userService.userSubject.next({ ...this.userService.userSubject.value, myCart: response });
-      this.onNoClick();
+      this.userService.updateUserCart(response);
+      this.dialogRef.close();
     });
   }
 }

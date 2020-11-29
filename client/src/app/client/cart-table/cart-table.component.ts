@@ -13,28 +13,30 @@ export class CartTableComponent implements OnInit {
   dataSource: MatTableDataSource<any>;
   totalPrice = 0;
   orderMode = false;
-  displayedColumns = ['name', 'quantity', 'price', 'customColumn1'];
+  displayedColumns = ['name', 'quantity', 'price', 'remove'];
 
   constructor(private userService: UserService, private router: Router) { }
 
   ngOnInit() {
-    this.userService.userSubjectOBS.subscribe(data => {
-      if (this.router.url === '/payment') {
-        this.orderMode = true;
-        this.displayedColumns = ['name', 'quantity', 'price'];
-      }
+    const user = this.userService.getUser();
 
-      this.dataSource = new MatTableDataSource();
-      this.dataSource.sort = this.sort;
-      this.dataSource.data = data.myCart.cartItems;
-      this.totalPrice = data.myCart.cartItems.map(t => t.price).reduce((acc, value) => acc + value, 0);
-    });
+    if (!user || !user.myCart) {
+      return;
+    }
+
+    if (this.router.url === '/payment') {
+      this.orderMode = true;
+      this.displayedColumns = ['name', 'quantity', 'price'];
+    }
+
+    this.dataSource = new MatTableDataSource();
+    this.dataSource.sort = this.sort;
+    this.dataSource.data = user.myCart.cartItems;
+    this.totalPrice = user.myCart.cartItems.map(t => t.price).reduce((acc, value) => acc + value, 0);
   }
 
   removeProd(product) {
-    this.userService.removeFromCart(product.productID).subscribe(data => {
-      this.userService.userSubject.next({ ...this.userService.userSubject.value, myCart: data });
-    });
+    this.userService.removeFromCart(product.productID);
   }
 
   payment() {

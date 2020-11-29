@@ -15,8 +15,8 @@ const routerOptions: ExtraOptions = {
 
 const routes: Routes = [
   { path: 'register', component: RegisterComponent },
-  // { path: 'login', component: LandingPageComponent },
-  { path: 'shopping', component: HomeComponent, canActivate: [AuthGuard] },
+  { path: 'login', component: LandingPageComponent },
+  { path: 'shopping', component: HomeComponent, canActivate: [AuthGuard], canLoad: [AuthGuard] },
   { path: 'payment', component: OrderScreenComponent, canActivate: [AuthGuard, OrderModeGuard] },
   { path: '', pathMatch: 'full', component: LandingPageComponent }
 ];

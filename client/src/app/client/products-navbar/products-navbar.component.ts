@@ -1,6 +1,6 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { MatSidenav } from '@angular/material';
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
@@ -14,10 +14,10 @@ import { UserService } from './../../services/user.service';
 })
 export class ProductsNavbarComponent implements OnInit {
   @ViewChild('drawer', { static: false }) public myNav: MatSidenav;
-  searchGroup: FormGroup;
   allCategories: [] = [];
   cartBadge = 0;
   role: string;
+  searchControl = new FormControl('');
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
@@ -26,52 +26,54 @@ export class ProductsNavbarComponent implements OnInit {
 
   constructor(
     private breakpointObserver: BreakpointObserver,
-    private formBuilder: FormBuilder,
     private storeService: StoreService,
     private userService: UserService
   ) { }
 
   ngOnInit() {
-    this.searchGroup = this.formBuilder.group({
-      searchText: ['']
-    });
+    this.getAllCategories();
+    this.subscribeFilterChanges();
 
-    // Getting all categories from server
-    this.storeService.getAllCategories().subscribe(categoriesData => {
-      this.allCategories = categoriesData;
-    });
+    const user = this.userService.getUser();
+    this.role = user.role;
 
-    // A server call to check if product exist
-    this.searchGroup.valueChanges.pipe(
+    if (this.role === 'user') {
+      this.setCartBadge(user.myCart);
+    }
+
+    if (this.role === 'admin') {
+      this.subscribeEditModeChanges();
+    }
+  }
+
+  subscribeEditModeChanges() {
+    this.storeService.editModeEvnt.subscribe(() => this.myNav.open());
+  }
+
+  subscribeFilterChanges() {
+    this.searchControl.valueChanges.pipe(
       debounceTime(1000),
       distinctUntilChanged())
-      .subscribe(val => {
-        if (val.searchText === '') {
-          this.storeService.getAllProducts().subscribe(response => {
-            this.storeService.refreshProdsEm.emit(response);
-          });
+      .subscribe(searchText => {
+        let products;
+
+        if (searchText === '') {
+          this.storeService.getAllProducts().subscribe(response => products = response);
         } else {
-          this.storeService.findProduct(val).subscribe(results => {
-            this.storeService.refreshProdsEm.emit(results);
-          });
+          this.storeService.findProduct(searchText).subscribe(response => products = response);
         }
+
+        this.storeService.refreshProdsEm.emit(products);
       });
+  }
 
-    // Update products amount in cart
-    this.userService.userSubjectOBS.subscribe(data => {
-      this.role = data.role;
-      if (data.role === 'user') {
-        this.cartBadge = 0;
-        data.myCart.cartItems.map(c => {
-          this.cartBadge += c.quantity;
-        });
-      }
-    });
+  setCartBadge(cart: any) {
+    this.cartBadge = 0;
+    cart.cartItems.forEach(c => this.cartBadge += c.quantity);
+  }
 
-    // Apply edit mode
-    this.storeService.editModeEvnt.subscribe(data => {
-      this.myNav.open();
-    });
+  getAllCategories() {
+    this.storeService.getAllCategories().subscribe(categories => this.allCategories = categories);
   }
 
   // Event Emitter for changing the product's display

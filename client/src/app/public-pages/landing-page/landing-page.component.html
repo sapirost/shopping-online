@@ -1,12 +1,12 @@
 <section class="private-details">
-  <a class="startBTN" mat-button [routerLink]="'/shopping'">
-    <h3 *ngIf="openCart && role != 'admin'">Resume Shopping</h3>
-    <h3 *ngIf="!openCart && role != 'admin'">Start Shopping</h3>
-    <h3 *ngIf="role == 'admin'">Shopping Panel</h3>
+  <a class="startBTN" mat-button routerLink="/shopping">
+    <h3 *ngIf="openCart">Resume Shopping</h3>
+    <h3 *ngIf="!openCart && user?.role != 'admin'">Start Shopping</h3>
+    <h3 *ngIf="user?.role == 'admin'">Shopping Panel</h3>
   </a>
 
-  <app-login *ngIf="!connect"></app-login>
-  <div *ngIf="connect && role == 'user'">
+  <app-login *ngIf="!user?.connect"></app-login>
+  <div *ngIf="user?.connect && user?.role == 'user'">
     <h5>Notification:</h5>
     <p *ngIf="!lastOrder && !openCart">
       Welcome To Your First Shopping Experience
@@ -29,7 +29,8 @@
     src="https://securecdn.pymnts.com/wp-content/uploads/2017/03/shutterstock_604474112.jpg"
   />
   <p>
-    Available products in our virtual store - <strong>{{ prodsAmount }}</strong>
+    Available products in our virtual store -
+    <strong>{{ prodsAmount }}</strong>
   </p>
   <p>
     Number of orders submitted in our store -

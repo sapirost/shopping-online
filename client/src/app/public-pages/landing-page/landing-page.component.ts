@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { StoreService } from 'src/app/services/store.service';
 import { UserService } from './../../services/user.service';
 
@@ -14,46 +13,42 @@ export class LandingPageComponent implements OnInit {
   cartDate: any;
   lastOrder: any;
   openCart = false;
-  connect = false;
-  role: string;
+  user: any;
 
   constructor(
     private storeService: StoreService,
     private userService: UserService,
-    private router: Router
   ) { }
 
   ngOnInit() {
-    this.refreshData();
+    const user = this.userService.getUser();
+    this.setData(user);
 
-    this.userService.userSubjectOBS.subscribe(data => {
-      this.connect = data.connect;
-      if (data.connect) {
-        this.role = data.role;
-      }
-      this.refreshData();
-    });
+    this.userService.userObservable.subscribe(res => this.setData(res));
   }
 
-  refreshData() {
+  setData(user) {
+    this.user = user;
+
+    if (user.connect && user.role === 'user') {
+      this.getCart();
+    }
+  }
+
+  getCart() {
     this.storeService.getInfo().subscribe(data => {
       this.prodsAmount = data.products;
       this.ordersAmount = data.orders;
-      if (data.cartStatus) {
-        switch (data.cartStatus) {
-          case 'open':
-            this.openCart = true;
-            this.cartDate = data.myCart[0].creationDate;
-            break;
-          case 'close':
-            this.lastOrder = data.lastOrder;
-            break;
-        }
-      }
-    });
-  }
 
-  routing() {
-    this.router.navigateByUrl('/shopping');
+      if (data.cartStatus === 'close') {
+        this.lastOrder = data.lastOrder;
+      }
+
+      if (data.cartStatus === 'open') {
+        this.openCart = true;
+        this.cartDate = data.myCart[0].creationDate;
+      }
+    },
+      err => console.error(err));
   }
 }

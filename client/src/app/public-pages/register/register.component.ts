@@ -12,7 +12,7 @@ import { UserService } from './../../services/user.service';
 export class RegisterComponent implements OnInit {
   firstRegisterGroup: FormGroup;
   secondRegisterGroup: FormGroup;
-  linear: false;
+  linear = false;
 
   constructor(
     private userService: UserService,
@@ -28,6 +28,7 @@ export class RegisterComponent implements OnInit {
       password: ['', Validators.required],
       repeatPass: ['', [Validators.required]]
     });
+
     this.secondRegisterGroup = this.formBuilder.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
@@ -38,28 +39,16 @@ export class RegisterComponent implements OnInit {
 
   addUser() {
     const bothForms = Object.assign(this.firstRegisterGroup.value, this.secondRegisterGroup.value);
-    this.userService.addNewUser(bothForms).subscribe(data => {
-      this.userService.userSubject.next(data);
-      this.cleanForm();
-      this.userService.refreshUserEvnt.emit(data);
-      this.router.navigateByUrl('/');
-    },
-      err => this.snackBar.open('something went wrong! please try again...'));
-  }
+    this.userService.addNewUser(bothForms);
 
-  cleanForm() {
-    this.firstRegisterGroup = this.formBuilder.group({
-      numberID: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
-      usernameMail: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
-      repeatPass: ['', [Validators.required]]
-    });
-    this.secondRegisterGroup = this.formBuilder.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      city: ['', Validators.required],
-      street: ['', Validators.required],
-    });
+    this.userService.addNewUser(bothForms).subscribe(data => {
+      this.userService.updateUser(data);
+      this.router.navigateByUrl('/shopping');
+    },
+      err => {
+        const errMessage = err.error === 'Unauthorized' ? 'user does not exist' : 'something went wrong, please try again';
+        this.snackBar.open(errMessage);
+      });
   }
 
   getErrorMessage() {

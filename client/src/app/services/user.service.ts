@@ -1,7 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { EventEmitter, Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { JwtHelperService } from '@auth0/angular-jwt';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseService } from './base-service';
@@ -12,10 +10,9 @@ import { BaseService } from './base-service';
 export class UserService extends BaseService {
   private BASE_SERVICE_URL = 'users';
 
-  jwtHelper: JwtHelperService = new JwtHelperService();
-  refreshUserEvnt: EventEmitter<any> = new EventEmitter();
-  userSubject = new BehaviorSubject<any>({ connect: false });
-  userSubjectOBS = this.userSubject.asObservable();
+  // jwtHelper: JwtHelperService = new JwtHelperService();
+  private userSubject = new BehaviorSubject<any>({ connect: false });
+  userObservable = this.userSubject.asObservable();
 
   private endPoints = {
     GET_CONNECTED_USER: `/get-connected-member`,
@@ -29,25 +26,14 @@ export class UserService extends BaseService {
     },
   };
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private http: HttpClient) {
     super();
   }
 
   addNewUser(userObj: any): any {
     const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.REGISTER);
 
-    return this.http.post(fullEndPoint, userObj)
-      .pipe(
-        map(
-          (res: Response) => {
-            this.userSubject.next(res);
-          },
-          error => {
-            console.log('unable to register team member', error);
-            this.userSubject.next({ connect: false });
-          }
-        )
-      );
+    return this.http.post(fullEndPoint, userObj);
   }
 
   logUser(userObj: any): Observable<any> {
@@ -56,28 +42,20 @@ export class UserService extends BaseService {
     return this.http.post(fullEndPoint, userObj);
   }
 
+
   checkUserID(): Observable<any> {
     const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.CHECK_USER_ID);
     return this.http.post(fullEndPoint, {});
   }
 
-  // logUser(userObj: any): Observable<any> {
-  //   return this.http.post(this.url + 'login', userObj);
-  // }
-
-  getUser(): Observable<any> {
-    const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.GET_CONNECTED_USER);
-    return this.http.get(fullEndPoint);
-  }
-
-  getUserSubject(): any {
-    return this.userSubjectOBS.subscribe(res => res);
+  getUser(): any {
+    return this.userSubject.getValue();
   }
 
   userLogout(): void {
     const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.LOGOUT);
     this.http.get(fullEndPoint);
-    window.location.href = '/login';
+
     this.userSubject.next({ connect: false });
   }
 
@@ -88,7 +66,23 @@ export class UserService extends BaseService {
 
   removeFromCart(productID: string): Observable<any> {
     const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.USER_CART(productID));
-    return this.http.delete(fullEndPoint);
+    // return this.http.delete(fullEndPoint);
+
+    return this.http.delete(fullEndPoint)
+      .pipe(
+        map(
+          res => this.updateUserCart(res),
+          error => console.error('unable to register team member', error)
+        )
+      );
+  }
+
+  updateUser(user: any) {
+    this.userSubject.next(user);
+  }
+
+  updateUserCart(cart: any) {
+    this.userSubject.next({ ...this.getUser(), myCart: cart });
   }
 
   getUserDeliveryInfo(): Observable<any> {

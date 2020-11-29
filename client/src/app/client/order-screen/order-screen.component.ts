@@ -24,11 +24,10 @@ export class OrderScreenComponent implements OnInit {
     creditDigit: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')])
   });
 
-  myFilter = (d: Date): boolean => {
-    const day = d.getDay();
-    // tslint:disable-next-line:no-shadowed-variable
+  myFilter = (date: Date): boolean => {
+    const day = date.getDay();
     const blockedDates = this.allDupedDates.map(d => d.valueOf());
-    return (!blockedDates.includes(d.valueOf())) && day !== 6;
+    return (!blockedDates.includes(date.valueOf())) && day !== 6;
   }
 
   constructor(
@@ -42,18 +41,13 @@ export class OrderScreenComponent implements OnInit {
 
   ngOnInit() {
     this.storeService.unavailableDates().subscribe(data => {
-      data.map(date => {
-        this.allDupedDates.push(new Date(date));
-      });
+      data.forEach(date => this.allDupedDates.push(new Date(date)));
     });
 
     // Get cart to ship
-    this.userService.userSubjectOBS.subscribe(data => {
-      this.cartToShip = data.myCart;
-      data.myCart.cartItems.map(c => {
-        this.totalPrice += c.price;
-      });
-    });
+    const user = this.userService.getUser();
+    this.cartToShip = user.myCart;
+    this.cartToShip.cartItems.forEach(item => this.totalPrice += item.price);
   }
 
   backHome() {
@@ -75,23 +69,25 @@ export class OrderScreenComponent implements OnInit {
 
   sendToOrder() {
     const delivery = new Date(this.shippingGroup.value.deliveryDate).toDateString();
-    const orderDetails = Object.assign(this.shippingGroup.value, this.cartToShip,
-      { orderDate: this.minDate.toDateString() }, { totalPrice: this.totalPrice },
-      { deliveryDate: delivery });
-    this.storeService.sendOrder(orderDetails).subscribe(response => {
-      if (response.msg === 'failed') {
-        this.snackBar.open('something went wrong! please try again...');
-      } else {
+    const orderDetails = Object.assign(
+      this.shippingGroup.value,
+      this.cartToShip,
+      { orderDate: this.minDate.toDateString() },
+      { totalPrice: this.totalPrice },
+      { deliveryDate: delivery }
+    );
+
+    this.storeService.sendOrder(orderDetails).subscribe(
+      () => {
         this.openDialog();
+        this.userService.updateUserCart([]);
         this.router.navigateByUrl('/shopping');
-        this.userService.userSubject.next({ ...this.userService.userSubject.value, myCart: { cartItems: [] } });
-      }
-    },
-      err => this.snackBar.open('something went wrong! please try again...'));
+      },
+      () => this.snackBar.open('something went wrong! please try again...'));
   }
 
   openDialog(): void {
-    const dialogRef = this.dialog.open(ReceiptPopupComponent, {
+    this.dialog.open(ReceiptPopupComponent, {
       width: '270px',
       data: { myCart: this.cartToShip.cartItems, totalPrice: this.totalPrice }
     });

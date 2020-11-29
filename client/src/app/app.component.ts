@@ -9,7 +9,7 @@ import { UserService } from './services/user.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  usernameTitle: string;
+  usernameTitle = 'Hello Guest';
   connect: boolean;
   role: string;
 
@@ -20,56 +20,23 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.userService.getUser().subscribe(user => {
-      this.refreshData(user);
-    },
-      err => {
-        this.userService.userSubject.next({ connect: false });
-        this.usernameTitle = 'Hello Guest';
-        this.connect = false;
-      });
+    const user = this.userService.getUser();
+    this.setUserData(user);
 
-    this.userService.refreshUserEvnt.subscribe(data => {
-      this.refreshData(data);
-    });
+    this.userService.userObservable.subscribe(res => this.setUserData(res));
   }
 
-  refreshData(data) {
-    console.log("🚀 ~ file: app.component.ts ~ line 53 ~ AppComponent ~ refreshData ~ data", data)
+  setUserData(user) {
+    this.connect = user.connect;
+    this.role = user.role;
 
-    if (data.fail) {
-      this.userService.userSubject.next({ connect: false });
-      this.usernameTitle = 'Hello Guest';
-      this.connect = false;
-    } else {
-      if (data.role === 'user' && (data.myCart.cart === null ||
-        (data.myCart.cart !== null && data.myCart.cart.status === 'close'))) {
-        data.myCart.cartItems = [];
-      }
-      this.userService.userSubject.next(data);
-      this.usernameTitle = data.usernameMail;
-      this.connect = true;
-      this.role = data.role;
-
-      if (data.role === 'admin') {
-        this.usernameTitle = 'Hello Admin !';
-      } else {
-        this.usernameTitle = data.success;
-      }
+    if (this.connect) {
+      this.usernameTitle = this.role === 'admin' ? 'Hello Admin !' : user.name;
     }
   }
 
   logout() {
-    // this.userService.userLogout().subscribe(data => {
-    //   this.userService.userSubject.next({connect: false});
-    //   this.usernameTitle = 'Hello Guest';
-    //   this.connect = false;
-    //   this.router.navigateByUrl('/login');
-    // });
-
     this.userService.userLogout();
-    this.usernameTitle = 'Hello Guest';
-    this.connect = false;
-    // this.router.navigateByUrl('/login');
+    this.router.navigateByUrl('/login');
   }
 }
