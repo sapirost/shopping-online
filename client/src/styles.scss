@@ -1,91 +1,91 @@
-@import url('https://fonts.googleapis.com/css?family=Poppins|Quicksand');
+@import url("https://fonts.googleapis.com/css?family=Poppins|Quicksand");
+@import '~@angular/material/theming';
 
-html, body,mat-sidenav-container, app-root { 
-    height: 100%; 
-    width: 100%;
-    margin: 0;
-    overflow-x: hidden;
+$font: "Poppins", sans-serif;
+
+$custom-typography: mat-typography-config(
+	$font-family: $font,
+);
+
+* {
+  font-family: $font;
+  @include angular-material-typography($custom-typography);
 }
 
-body { 
-    margin: 0; 
-    display: flex;
-    flex-direction: column;
-    font-family: 'Poppins', sans-serif; 
-}
-
+html,
+.mat-sidenav-container,
 app-root {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  overflow-x: hidden;
 }
 
-app-home {
-    position: relative;
+body {
+  margin: 0;
 }
 
-app-landing-page {
-    display: inline-flex;
-    flex-flow: wrap;
-    justify-content: space-around;
-    align-items: center;
-    align-content: center;
-    width: 99%;
-    margin: 10px auto;
-    section {
-        text-align: center;
-        width: 200px;
-        flex-basis: auto;
-        align-self: auto;
-        margin: 5px;
-    }
+.app-inner-content-wrapper {
+  display: inline-flex;
+  flex-flow: wrap;
+  justify-content: space-around;
+  align-items: center;
+  align-content: center;
+  width: 100%;
+  margin: 10px auto;
 }
 
 .mat-dialog-container {
-    border: 0.5px solid #0000006b!important;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 2px 8px 0 rgba(0, 0, 0, 0.19);
-    text-align: center;
+  border: 0.5px solid #0000006b;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 2px 8px 0 rgba(0, 0, 0, 0.19);
+  text-align: center;
 }
 
 //styling the scrollbar of the notes and textarea
-.sidenav, .mat-sidenav-container, .cart-section {
-    ::-webkit-scrollbar {
-        width: 10px;
-        
-      &-track {
-        background: #f1f1f1; 
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.363);
-      }
-       
-      &-thumb {
-        background: rgb(170, 170, 170);
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.363);
-      }
-      
-      &-thumb:hover {
-        background: rgb(136, 136, 136); 
-      }
-   }
-  }
+.sidenav,
+.mat-sidenav-container,
+.cart-section {
+  ::-webkit-scrollbar {
+    width: 10px;
 
-  .cart-section .cart-table {
-    width: 95%;
-    margin: auto;
-    .mat-sort-header-container {
-      justify-content: center;
+    &-track {
+      background: #f1f1f1;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.363);
+    }
+
+    &-thumb {
+      background: rgb(170, 170, 170);
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.363);
+    }
+
+    &-thumb:hover {
+      background: rgb(136, 136, 136);
     }
   }
+}
 
-  .cart-section .total-price {
-      align-self: flex-end;
+.cart-section .cart-table {
+  width: 95%;
+  margin: auto;
+  .mat-sort-header-container {
+    justify-content: center;
   }
+}
 
-  .receipt-dialog .get-receipt-btn {
-    cursor: pointer;
-    text-decoration-line: underline;
-    color: blue;
-    font-style: oblique;
-    &:hover {
-      color: #0000a5;
-    }
+.cart-section .total-price {
+  align-self: flex-end;
+}
+
+.receipt-dialog .get-receipt-btn {
+  cursor: pointer;
+  text-decoration-line: underline;
+  color: blue;
+  font-style: oblique;
+  &:hover {
+    color: #0000a5;
   }
+}
+
+.spacer {
+  flex: 1 4 auto;
+}

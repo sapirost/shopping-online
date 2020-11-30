@@ -1,0 +1,29 @@
+<header>
+    <div class="cover"></div>
+    <mat-toolbar class="user-section">
+      <div class="logo-wrap">
+        <label class="logo" routerLink="">
+          <img src="../assets/img/mylogo.png" />
+          <div>
+            <p class="details">My Virtual</p>
+            <p class="details">Store</p>
+          </div>
+        </label>
+      </div>
+  
+      <div class="spacer"></div>
+  
+      <div class="small-screen">
+        <label class="user-title">
+          Hello {{ username || 'Guest' }}<br/>
+        </label>
+
+        <button class="small-btn" *ngIf="username" mat-button (click)="logout()">
+          Logout
+        </button>
+  
+        <a *ngIf="!username" [routerLink]="'register'">Register | </a>
+        <a *ngIf="!username" [routerLink]="'login'">Login</a>
+      </div>
+    </mat-toolbar>
+  </header>

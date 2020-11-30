@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { ExtraOptions, RouterModule, Routes } from '@angular/router';
-import { HomeComponent } from './client/home/home.component';
-import { OrderScreenComponent } from './client/order-screen/order-screen.component';
+import { RegisterComponent } from './components/authentication/register/register.component';
+import { HomeComponent } from './components/home/home.component';
+import { LandingPageComponent } from './components/landing-page/landing-page.component';
+import { OrderScreenComponent } from './components/order-screen/order-screen.component';
 import { AuthGuard } from './guards/auth.guard';
 import { OrderModeGuard } from './guards/order-mode.guard';
-import { LandingPageComponent } from './public-pages/landing-page/landing-page.component';
-import { RegisterComponent } from './public-pages/register/register.component';
 
 const routerOptions: ExtraOptions = {
   onSameUrlNavigation: 'reload',

@@ -8,7 +8,7 @@ import { UserService } from './../services/user.service';
 export class OrderModeGuard implements CanActivate {
   constructor(private userService: UserService, private router: Router) { }
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+  canActivate(_route: ActivatedRouteSnapshot, _state: RouterStateSnapshot) {
     const user = this.userService.getUser();
 
     if (!user.myCart || user.myCart.cartItems.length === 0) {

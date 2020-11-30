@@ -41,6 +41,12 @@ router.get('/get-info', async function (req, res, next) {
   res.json(infoObject);
 });
 
+//get all products
+router.get("/all", async function (req, res) {
+  var data = await storeModule.getAllProducts();
+  res.json(data);
+});
+
 //get categories list
 router.get("/categories", async function (req, res) {
   var result = await storeModule.getAllCategories();
@@ -99,12 +105,6 @@ router.put('/:id', async (req, res, next) => {
       return res.status(500).json(err)
     }
   });
-});
-
-//get all products
-router.get("/all", async function (req, res) {
-  var data = await storeModule.getAllProducts();
-  res.json(data);
 });
 
 //submit new order

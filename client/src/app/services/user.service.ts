@@ -1,5 +1,8 @@
+import { isEmpty } from 'lodash';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseService } from './base-service';
@@ -10,8 +13,8 @@ import { BaseService } from './base-service';
 export class UserService extends BaseService {
   private BASE_SERVICE_URL = 'users';
 
-  // jwtHelper: JwtHelperService = new JwtHelperService();
-  private userSubject = new BehaviorSubject<any>({ connect: false });
+  jwtHelper: JwtHelperService = new JwtHelperService();
+  private userSubject = new BehaviorSubject<any>({ });
   userObservable = this.userSubject.asObservable();
 
   private endPoints = {
@@ -26,20 +29,44 @@ export class UserService extends BaseService {
     },
   };
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private snackBar: MatSnackBar) {
     super();
   }
 
   addNewUser(userObj: any): any {
     const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.REGISTER);
 
-    return this.http.post(fullEndPoint, userObj);
+    return this.http.post(fullEndPoint, userObj).pipe(
+      map(
+        (results: any) => {
+          localStorage.setItem('token', results.token);
+          const user = this.getDecodedToken();
+          this.updateUser(user);
+          return user;
+        },
+        err => {
+          const errMessage = err.error === 'Unauthorized' ? 'user does not exist' : 'something went wrong, please try again';
+          this.snackBar.open(errMessage);
+        })
+    );
   }
 
   logUser(userObj: any): Observable<any> {
     const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.LOGIN);
 
-    return this.http.post(fullEndPoint, userObj);
+    return this.http.post(fullEndPoint, userObj).pipe(
+      map(
+        (results: any) => {
+          localStorage.setItem('token', results.token);
+          const user = this.getDecodedToken();
+          this.updateUser(user);
+          return user;
+        },
+        err => {
+          const errMessage = err.error === 'Unauthorized' ? 'user does not exist' : 'something went wrong, please try again';
+          this.snackBar.open(errMessage);
+        })
+    );
   }
 
 
@@ -49,14 +76,32 @@ export class UserService extends BaseService {
   }
 
   getUser(): any {
-    return this.userSubject.getValue();
+    const user = this.userSubject.getValue();
+
+    if (isEmpty(user)) {
+      const decodedUser = this.getDecodedToken();
+      this.updateUser(decodedUser);
+      return decodedUser;
+    }
+
+    return user;
+  }
+
+  getDecodedToken() {
+    const token = localStorage.getItem('token');
+
+    if (this.jwtHelper.isTokenExpired(token)) {
+      localStorage.removeItem('token');
+
+      return null;
+    }
+
+    return this.jwtHelper.decodeToken(token);
   }
 
   userLogout(): void {
-    const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.LOGOUT);
-    this.http.get(fullEndPoint);
-
-    this.userSubject.next({ connect: false });
+    localStorage.removeItem('token');
+    this.userSubject.next({ });
   }
 
   addToUserCart(productID: string, quantity: number): Observable<any> {
