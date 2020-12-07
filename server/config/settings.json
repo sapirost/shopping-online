@@ -1,0 +1,6 @@
+{
+    "Authentication": {
+        "jwtAppSecret": "fsdg87gwhr34hj3yj",
+        "jwtExpireTime": 604800
+    }
+}

@@ -1,12 +1,11 @@
 const localStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
-
 const User = require('../models/userModel');
 
 module.exports = passport => {
     passport.use('local-login',
-        new localStrategy({ usernameField: 'usernameMail' }, (username, password, done) => {
-            User.findOne({ usernameMail: username })
+        new localStrategy({ usernameField: 'email' }, (username, password, done) => {
+            User.findOne({ email: username })
                 .then(user => {
                     if (!user) {
                         return done(null, false, { message: 'user does not exist' })
@@ -27,26 +26,26 @@ module.exports = passport => {
 
 
     passport.use('local-register',
-        new localStrategy({ usernameField: 'numberID', passReqToCallback: true },
+        new localStrategy({ usernameField: 'email', passReqToCallback: true },
 
-            function (req, numberID, password, done) {
-                var generateHash = function (password) {
+            (req, email, password, done) => {
+                var generateHash = (password) => {
                     return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
                 };
 
-                User.findOne({ where: { numberID: numberID } }).then(function (user) {
+                User.findOne({ email }).then((user) => {
 
                     if (user) {
-                        return done(null, false, { message: 'That ID already exist' });
+                        return done(null, false, { message: 'That user already exist' });
                     }
 
                     else {
                         var userPassword = generateHash(password);
                         var data =
                         {
-                            numberID: numberID,
+                            numberID: req.body.numberID,
                             password: userPassword,
-                            usernameMail: req.body.usernameMail,
+                            email: email,
                             firstName: req.body.firstName,
                             lastName: req.body.lastName,
                             city: req.body.city,
@@ -54,7 +53,7 @@ module.exports = passport => {
                             role: 'user'
                         };
 
-                        User.create(data).then(function (newUser, created) {
+                        User.create(data).then((newUser, created) => {
                             if (!newUser) {
                                 return done(null, false);
                             }
@@ -74,8 +73,8 @@ module.exports = passport => {
         })
 
     passport.deserializeUser((id, done) => {
-            User.findById(id, (err, user) => {
-                done(err, user);
-            });
+            User.findById(id)
+            .then(user => done(null, user))
+            .catch(err => done(err))
         });
 }

@@ -19,13 +19,13 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit() {
     const user = this.userService.getUser();
-    this.username = user && user.name;
+    this.username = user && user.firstName;
 
-    this.userService.userObservable.subscribe(res => this.username = res && res.name);
+    this.userService.userObservable.subscribe(res => this.username = res && res.firstName);
   }
 
   logout() {
-    this.userService.userLogout();
+    this.userService.logout();
     this.router.navigateByUrl('/login');
   }
 }

@@ -44,10 +44,10 @@ export class OrderScreenComponent implements OnInit {
       data.forEach(date => this.allDupedDates.push(new Date(date)));
     });
 
-    // Get cart to ship
-    const user = this.userService.getUser();
-    this.cartToShip = user.myCart;
-    this.cartToShip.cartItems.forEach(item => this.totalPrice += item.price);
+    this.userService.getUserCart().subscribe(res => {
+      this.cartToShip = res;
+      this.cartToShip.cartItems.forEach(item => this.totalPrice += item.price);
+    });
   }
 
   backHome() {
@@ -80,7 +80,7 @@ export class OrderScreenComponent implements OnInit {
     this.storeService.sendOrder(orderDetails).subscribe(
       () => {
         this.openDialog();
-        this.userService.updateUserCart([]);
+        this.userService.updateUserCart(null);
         this.router.navigateByUrl('/shopping');
       },
       () => this.snackBar.open('something went wrong! please try again...'));

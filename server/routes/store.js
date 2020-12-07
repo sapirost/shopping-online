@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var storeModule = require('../modules/store.module');
+const auth = require('../middleware/authentication');
 
 var multer = require("multer");
 var path = require('path');
@@ -19,19 +20,20 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage }).single('image');
 
 //insert categories list
-router.get('/insert-categories', async (req, res, next) => {
+router.get('/insert-categories', auth, async (req, res, next) => {
   var allCategories = await storeModule.insertAllCategories();
   res.json(allCategories);
 });
 
 //get unavailable dates for shipping
-router.get('/unavailable-dates', async (req, res, next) => {
+router.get('/unavailable-dates', auth, async (req, res, next) => {
   var results = await storeModule.unavailableDates();
   res.json(results);
 })
 
 //getting general information for landing page
-router.get('/get-info', async function (req, res, next) {
+router.get('/get-info', auth, async function (req, res, next) {
+  console.log("🚀 ~ file: users.js ~ line 54 ~ router.get ~ req.user", req.user)
   var result = await storeModule.getGeneralInfo();
   var infoObject = result;
   if (req.session.passport && req.user.role == 'user') {
@@ -42,13 +44,13 @@ router.get('/get-info', async function (req, res, next) {
 });
 
 //get all products
-router.get("/all", async function (req, res) {
+router.get("/all", auth, async function (req, res) {
   var data = await storeModule.getAllProducts();
   res.json(data);
 });
 
 //get categories list
-router.get("/categories", async function (req, res) {
+router.get("/categories", auth, async function (req, res) {
   var result = await storeModule.getAllCategories();
   res.json(result);
 });
@@ -64,31 +66,31 @@ router.get('/image/:name', (req, res, next) => {
 })
 
 //get all products from specific category
-router.get("/by-category-id/:id", async function (req, res) {
+router.get("/by-category-id/:id", auth, async function (req, res) {
   var data = await storeModule.getProductsFromCategory(req.params.id);
   res.json(data);
 });
 
 //find product by name
-router.get('/by-name/:name', async (req, res, next) => {
+router.get('/by-name/:name', auth, async (req, res, next) => {
   var results = await storeModule.findProducts(req.params.name);
   res.json(results);
 })
 
 //delete product
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', auth, async (req, res, next) => {
   var results = await storeModule.deleteProduct(req.params.id);
   res.json(results);
 })
 
 //get specific product
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', auth, async (req, res, next) => {
   var results = await storeModule.findProductById(req.params.id);
   res.json(results);
 })
 
 //update existing product
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', auth, async (req, res, next) => {
   var result;
   upload(req, res, async function (err) {
     if (req.file !== undefined) {
@@ -108,13 +110,13 @@ router.put('/:id', async (req, res, next) => {
 });
 
 //submit new order
-router.post("/send-order", async function (req, res) {
+router.post("/send-order", auth, async function (req, res) {
   var data = await storeModule.submitOrder(req.body, req.user._id);
   res.json(data);
 });
 
 //adding new product
-router.post("/", async function (req, res) {
+router.post("/", auth, async function (req, res) {
   upload(req, res, async function (err) {
     if (err || req.file == undefined) {
       res.status(500).send('Something broke!')

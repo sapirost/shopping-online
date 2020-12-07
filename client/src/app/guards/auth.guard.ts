@@ -12,7 +12,7 @@ export class AuthGuard implements CanActivate, CanLoad {
   canActivate(_route: ActivatedRouteSnapshot, _state: RouterStateSnapshot) {
     const user = this.userService.getUser();
 
-    if (isEmpty(user) || !user.connect) {
+    if (isEmpty(user)) {
       this.router.navigateByUrl('/login');
 
       return false;
@@ -24,7 +24,7 @@ export class AuthGuard implements CanActivate, CanLoad {
   canLoad(): boolean {
     const user = this.userService.getUser();
 
-    if (isEmpty(user) || !user.connect) {
+    if (isEmpty(user)) {
       this.router.navigateByUrl('/login');
 
       return false;

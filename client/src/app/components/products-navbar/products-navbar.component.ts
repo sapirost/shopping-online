@@ -1,3 +1,4 @@
+import { UserRole } from './../../models/user.model';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
@@ -16,7 +17,7 @@ export class ProductsNavbarComponent implements OnInit {
   @ViewChild('drawer', { static: false }) public myNav: MatSidenav;
   allCategories: [] = [];
   cartBadge = 0;
-  role: string;
+  role: UserRole;
   searchControl = new FormControl('');
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
@@ -37,11 +38,11 @@ export class ProductsNavbarComponent implements OnInit {
     const user = this.userService.getUser();
     this.role = user.role;
 
-    if (this.role === 'user') {
-      this.setCartBadge(user.myCart);
+    if (this.role === UserRole.client) {
+      this.userService.getUserCart().subscribe(res => this.setCartBadge(res));
     }
 
-    if (this.role === 'admin') {
+    if (this.role === UserRole.admin) {
       this.subscribeEditModeChanges();
     }
   }
@@ -69,7 +70,7 @@ export class ProductsNavbarComponent implements OnInit {
 
   setCartBadge(cart: any) {
     this.cartBadge = 0;
-    cart.cartItems.forEach(c => this.cartBadge += c.quantity);
+    cart.items.forEach(c => this.cartBadge += c.quantity);
   }
 
   getAllCategories() {

@@ -1,18 +1,52 @@
-var UserModel = require('../models/userModel');
-var CartModel = require('../models/cartModel');
-var ProdModel = require('../models/prodModel');
+const UserModel = require('../models/userModel');
+const CartModel = require('../models/cartModel');
+const ProdModel = require('../models/prodModel');
+const config = require('../config/settings');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const _ = require('lodash');
 
-var userModule = {
+module.exports = {
 
-    findUser: function (numberID) {
+    findUser: numberID => {
         return UserModel.findOne({ numberID: numberID });
     },
 
-    getCart: async function (userID) {
-        var cartArr = [];
-        var myCart = await CartModel.findOne({ "user": userID, status: 'open' });
-        if (myCart == null || myCart == undefined)
-            myCart = await CartModel.findOne({ "user": userID });
+    findUserById: userId => {
+        return UserModel.findOne({ _id: userId });
+    },
+
+    // getUserToken: (user, cart) => {
+    //     const body = { _id: user._id, firstName: user.firstName, role: user.role, myCart: cart };
+    //     return jwt.sign(body, config.Authentication.jwtAppSecret);
+    // },
+
+    login: (email, password) => {
+        return new Promise(async (resolve, reject) => {
+            const user = await UserModel.findOne({ email });
+
+            if (!user) {
+                reject({ message: 'user does not exist' })
+            }
+
+            const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+            if (!isPasswordMatch) {
+                reject({ message: 'user does not exist' })
+            }
+
+            const body = { _id: user._id, firstName: user.firstName, role: user.role };
+            const token = jwt.sign(body, config.Authentication.jwtAppSecret);
+            resolve({ token });
+        })
+    },
+
+    getCart: async userID => {
+        const cartArr = [];
+        let cart = await CartModel.findOne({ "user": userID, status: 'open' });
+        if (_.isEmpty(cart)) {
+            cart = await CartModel.findOne({ "user": userID });
+        }
 
         await CartModel.findOne({ "user": userID, status: 'open' })
             .populate({
@@ -37,44 +71,43 @@ var userModule = {
                 });
             })
             .catch(err => { return err; });
-        return { cartItems: cartArr, cart: myCart };
+        return {...cart, items: cartArr};
     },
 
-    addToCart: function (userID, productID, quantity) {
+    addToCart: (userID, productID, quantity) => {
         return new Promise(async (resolve, reject) => {
-            var myCart = await CartModel.findOne({ user: userID, status: 'open' });
-            var singlePrice = await ProdModel.findOne({ _id: productID });
-            if (myCart !== null && myCart !== undefined) {
-
-                if (myCart.items.some(c => c.product.equals(productID))) {
+            const cart = await CartModel.findOne({ user: userID, status: 'open' });
+            const singlePrice = await ProdModel.findOne({ _id: productID });
+            if (!_.isEmpty(cart)) {
+                if (cart.items.some(c => c.product.equals(productID))) {
                     await CartModel.findOneAndUpdate({ 'user': userID, status: 'open', 'items.product': productID },
                         { $inc: { "items.$.quantity": quantity, "items.$.price": (singlePrice.price * quantity) } })
                 } else {
-                    myCart.items.push({
+                    cart.items.push({
                         product: productID, quantity: quantity,
-                        cart: myCart._id, price: singlePrice.price * quantity
+                        cart: cart._id, price: singlePrice.price * quantity
                     });
-                    await myCart.save();
+                    await cart.save();
                 }
             } else {
-                var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                var today = new Date();
-                var newCart = new CartModel({ user: userID, creationDate: today.toLocaleDateString("en-US", options), status: 'open' })
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const today = new Date();
+                const newCart = new CartModel({ user: userID, creationDate: today.toLocaleDateString("en-US", options), status: 'open' })
                 newCart.items.push({
                     product: productID, quantity: quantity,
                     cart: newCart._id, price: singlePrice.price * quantity
                 })
                 await newCart.save();
             }
-            var cartData = await this.getCart(userID);
+            const cartData = await module.exports.getCart(userID);
             resolve(cartData);
             reject([]);
         });
     },
 
-    removeFromCart: function (userID, productID) {
+    removeFromCart: (userID, productID) => {
         return new Promise(async (resolve, reject) => {
-            var singleProduct = await ProdModel.findOne({ _id: productID });
+            const singleProduct = await ProdModel.findOne({ _id: productID });
 
             await CartModel.findOneAndUpdate({ 'user': userID, status: 'open', 'items.product': productID },
                 { $inc: { "items.$.quantity": -1, "items.$.price": -(singleProduct.price) } })
@@ -82,11 +115,11 @@ var userModule = {
             await CartModel.findOneAndUpdate({ 'user': userID, status: 'open', 'items.quantity': 0 },
                 { "$pull": { "items": { "quantity": 0 } } }, { safe: true, multi: true });
 
-            var cartData = await this.getCart(userID);
+            const cartData = await module.exports.getCart(userID);
             resolve(cartData);
             reject([]);
         });
     }
 }
 
-module.exports = userModule;
+// module.exports = userModule;

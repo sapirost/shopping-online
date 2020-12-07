@@ -1,5 +1,5 @@
 import { LayoutModule } from '@angular/cdk/layout';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatBadgeModule, MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule, MatNativeDateModule, MatOptionModule, MatSelectModule, MatSidenavModule, MatSnackBarModule, MatSortModule, MatStepperModule, MatTableModule, MatToolbarModule, MatTooltipModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material';
@@ -23,6 +23,7 @@ import { AmountPopupComponent } from './components/popups/amount-popup/amount-po
 import { ReceiptPopupComponent } from './components/popups/receipt-popup/receipt-popup.component';
 import { ProductsNavbarComponent } from './components/products-navbar/products-navbar.component';
 import { RegisterComponent } from './components/authentication/register/register.component';
+import { TokenInterceptor } from './interceptors/token-interceptor';
 
 @NgModule({
   declarations: [
@@ -45,12 +46,12 @@ import { RegisterComponent } from './components/authentication/register/register
   ],
   imports: [
     JwtModule.forRoot({
-			config: {
-				tokenGetter: () =>  { 
+      config: {
+        tokenGetter: () => {
           return localStorage.getItem('token');
-          } 
-			},
-		}),
+        }
+      },
+    }),
     BrowserModule,
     FormsModule,
     HttpClientModule,
@@ -80,7 +81,15 @@ import { RegisterComponent } from './components/authentication/register/register
   ],
   entryComponents: [AmountPopupComponent, ReceiptPopupComponent],
   providers: [
-    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 3000 } },
+    {
+      provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
+      useValue: { duration: 3000 }
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true,
+    },
   ],
   bootstrap: [AppComponent]
 })

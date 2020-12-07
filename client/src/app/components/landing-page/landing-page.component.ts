@@ -1,3 +1,4 @@
+import { User } from './../../models/user.model';
 import { Component, OnInit } from '@angular/core';
 import { StoreService } from 'src/app/services/store.service';
 import { UserService } from './../../services/user.service';
@@ -13,7 +14,7 @@ export class LandingPageComponent implements OnInit {
   cartDate: any;
   lastOrder: any;
   openCart = false;
-  user: any;
+  user: User;
 
   constructor(
     private storeService: StoreService,
@@ -27,10 +28,10 @@ export class LandingPageComponent implements OnInit {
     this.userService.userObservable.subscribe(res => this.setData(res));
   }
 
-  setData(user) {
+  setData(user: User) {
     this.user = user;
 
-    if (user && user.connect && user.role === 'user') {
+    if (user && user.role === 'user') {
       this.getCart();
     }
   }
@@ -40,13 +41,13 @@ export class LandingPageComponent implements OnInit {
       this.prodsAmount = data.products;
       this.ordersAmount = data.orders;
 
-      if (data.cartStatus === 'close') {
+      if (data.status === 'close') {
         this.lastOrder = data.lastOrder;
       }
 
-      if (data.cartStatus === 'open') {
+      if (data.status === 'open') {
         this.openCart = true;
-        this.cartDate = data.myCart[0].creationDate;
+        this.cartDate = data.creationDate;
       }
     },
       err => console.error(err));

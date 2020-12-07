@@ -18,7 +18,6 @@ export class AmountPopupComponent implements OnInit {
 
   addToMyCart(amount) {
     this.userService.addToUserCart(this.data.productID, amount).subscribe(response => {
-      console.log("🚀 ~ file: amount-popup.component.ts ~ line 21 ~ AmountPopupComponent ~ this.userService.addToUserCart ~ response", response)
       this.userService.updateUserCart(response);
       this.dialogRef.close();
     });
