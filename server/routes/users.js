@@ -40,6 +40,12 @@ router.post('/login', async (req, res) => {
   res.json({token});
 });
 
+router.get('/cart', auth, async (req, res) => {
+  const cart = await userModule.getCart(req.user._id);
+
+  res.json(cart);
+})
+
 router.put('/:id', auth, async (req, res, next) => {
   var result = await userModule.addToCart(req.user._id, req.params.id, req.body.quantity);
   res.json(result);
@@ -50,17 +56,11 @@ router.delete('/:id', auth, async (req, res, next) => {
   res.json(result);
 });
 
-router.get('/cart', auth, async (req, res) => {
-  const cart = await userModule.getCart(req.user._id);
-
-  res.json(cart);
-})
-
 router.get('/delivery-user-info', auth, async (req, res) => {
-  const user = await userModule.findUser(req.user.numberID);
+  const user = await userModule.findUserById(req.user._id);
 
   if (user) {
-    res.json({ deliveryInfo: { city: req.user.city, street: req.user.street } });
+    res.json({ deliveryInfo: { city: user.city, street: user.street } });
   } else {
     res.json({ deliveryInfo: null });
   }

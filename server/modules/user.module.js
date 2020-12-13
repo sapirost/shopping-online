@@ -8,18 +8,9 @@ const _ = require('lodash');
 
 module.exports = {
 
-    findUser: numberID => {
-        return UserModel.findOne({ numberID: numberID });
-    },
-
     findUserById: userId => {
         return UserModel.findOne({ _id: userId });
     },
-
-    // getUserToken: (user, cart) => {
-    //     const body = { _id: user._id, firstName: user.firstName, role: user.role, myCart: cart };
-    //     return jwt.sign(body, config.Authentication.jwtAppSecret);
-    // },
 
     login: (email, password) => {
         return new Promise(async (resolve, reject) => {
@@ -38,6 +29,45 @@ module.exports = {
             const body = { _id: user._id, firstName: user.firstName, role: user.role };
             const token = jwt.sign(body, config.Authentication.jwtAppSecret);
             resolve({ token });
+        })
+    },
+
+    register: user => {
+        return new Promise(async (resolve, reject) => {
+            const generateHash = password => {
+                return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+            };
+
+            User.findOne({ email: user.email }).then((user) => {
+
+                if (user) {
+                    return reject({ message: 'That user already exist' });
+                }
+
+                const encryptedPassword = generateHash(user.password);
+                const data =
+                {
+                    numberID: user.numberID,
+                    password: encryptedPassword,
+                    email: user.email,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    city: user.city,
+                    street: user.street,
+                    role: 'user'
+                };
+
+                User.create(data).then((newUser, created) => {
+                    if (!newUser) {
+                        return done(null, false);
+                    }
+
+                    if (newUser) {
+                        return done(null, newUser);
+
+                    }
+                });
+            });
         })
     },
 
@@ -71,7 +101,7 @@ module.exports = {
                 });
             })
             .catch(err => { return err; });
-        return {...cart, items: cartArr};
+        return {...cart.toJSON(), items: cartArr};
     },
 
     addToCart: (userID, productID, quantity) => {
@@ -121,5 +151,3 @@ module.exports = {
         });
     }
 }
-
-// module.exports = userModule;

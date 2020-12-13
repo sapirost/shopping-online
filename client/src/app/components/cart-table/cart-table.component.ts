@@ -18,21 +18,26 @@ export class CartTableComponent implements OnInit {
   constructor(private userService: UserService, private router: Router) { }
 
   ngOnInit() {
-    this.userService.getUserCart().subscribe(res => {
+    this.userService.cartObservable.subscribe(res => {
       if (this.router.url === '/payment') {
         this.orderMode = true;
         this.displayedColumns = ['name', 'quantity', 'price'];
       }
-  
-      this.dataSource = new MatTableDataSource();
-      this.dataSource.sort = this.sort;
-      this.dataSource.data = res.items;
-      this.totalPrice = res.items.map(t => t.price).reduce((acc, value) => acc + value, 0);
+
+      if (res) {
+        this.dataSource = new MatTableDataSource();
+        this.dataSource.sort = this.sort;
+        this.dataSource.data = res.items;
+        this.totalPrice = res.items.map(t => t.price).reduce((acc, value) => acc + value, 0);
+      }
     });
   }
 
   removeProd(product) {
-    this.userService.removeFromCart(product.productID);
+    this.userService.removeFromCart(product.productID).subscribe(
+      res => this.userService.updateUserCart(res),
+      error => console.error('unable to register team member', error)
+    );
   }
 
   payment() {

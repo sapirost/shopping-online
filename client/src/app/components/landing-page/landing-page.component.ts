@@ -1,6 +1,6 @@
-import { User } from './../../models/user.model';
+import { User, UserRole } from './../../models/user.model';
 import { Component, OnInit } from '@angular/core';
-import { StoreService } from 'src/app/services/store.service';
+import { StoreService } from './../../services/store.service';
 import { UserService } from './../../services/user.service';
 
 @Component({
@@ -22,33 +22,25 @@ export class LandingPageComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    const user = this.userService.getUser();
-    this.setData(user);
+    this.getStoreInformation();
 
-    this.userService.userObservable.subscribe(res => this.setData(res));
-  }
-
-  setData(user: User) {
-    this.user = user;
-
-    if (user && user.role === 'user') {
-      this.getCart();
+    this.user = this.userService.getUser();
+    if (this.user && this.user.role === UserRole.client) {
+      this.getUserCart();
     }
   }
 
-  getCart() {
-    this.storeService.getInfo().subscribe(data => {
-      this.prodsAmount = data.products;
-      this.ordersAmount = data.orders;
+  getUserCart() {
+    this.userService.cartObservable.subscribe(cart => {
+      this.openCart = cart && cart.status === 'open';
+      this.cartDate = cart && cart.creationDate;
+    });
+  }
 
-      if (data.status === 'close') {
-        this.lastOrder = data.lastOrder;
-      }
-
-      if (data.status === 'open') {
-        this.openCart = true;
-        this.cartDate = data.creationDate;
-      }
+  getStoreInformation() {
+    this.storeService.getInfo().subscribe(res => {
+      this.prodsAmount = res.products;
+      this.ordersAmount = res.orders;
     },
       err => console.error(err));
   }

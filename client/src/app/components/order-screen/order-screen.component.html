@@ -1,1 +1,74 @@
-<p>order-screen works!</p>
+<div class="order-screen-container">
+  <section class="cart-section">
+    <h4 class="title">Shopping List</h4>
+    <app-cart-table></app-cart-table>
+  </section>
+  <section class="payment-section">
+    <h3 class="title">Order</h3>
+    <h4 class="title">Shipping Details:</h4>
+    <p>
+      * Double click on input in order to <br />
+      get your saved information
+    </p>
+    <form [formGroup]="shippingGroup">
+      <mat-form-field>
+        <mat-label>City</mat-label>
+        <mat-select formControlName="city" (dblclick)="myInfo()">
+          <mat-option value="Jerusalem">Jerusalem</mat-option>
+          <mat-option value="Tel-Aviv">Tel-Aviv</mat-option>
+          <mat-option value="Haifa">Haifa</mat-option>
+          <mat-option value="Ashdod">Ashdod</mat-option>
+          <mat-option value="Beer-sheva">Beer-sheva</mat-option>
+          <mat-option value="Holon">Holon</mat-option>
+          <mat-option value="Eilat">Eilat</mat-option>
+          <mat-option value="Herzliya">Herzliya</mat-option>
+          <mat-option value="Kiryat-Shmona">Kiryat-Shmona</mat-option>
+          <mat-option value="Rishon-LeZion">Rishon-LeZion</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <br />
+      <mat-form-field>
+        <input
+          matInput
+          (dblclick)="myInfo()"
+          placeholder="Street"
+          formControlName="street"
+          autocomplete="off"
+        />
+      </mat-form-field>
+      <br />
+      <mat-form-field class="date-input">
+        <input
+          matInput
+          [matDatepickerFilter]="myFilter"
+          [matDatepicker]="picker"
+          placeholder="Shipping Date"
+          formControlName="deliveryDate"
+          [min]="minDate"
+          autocomplete="off"
+          (dblclick)="myInfo()"
+        />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+      <h4 class="title">Payments:</h4>
+      <mat-form-field>
+        <input
+          matInput
+          placeholder="Credit Card"
+          (dblclick)="myInfo()"
+          formControlName="creditDigit"
+          autocomplete="off"
+        />
+      </mat-form-field>
+    </form>
+    <button
+      mat-button
+      (click)="sendToOrder()"
+      [disabled]="this.shippingGroup.invalid"
+    >
+      Order
+    </button>
+    <button mat-button (click)="backHome()">Back To Shop</button>
+  </section>
+</div>

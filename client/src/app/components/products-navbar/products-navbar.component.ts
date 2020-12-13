@@ -39,7 +39,11 @@ export class ProductsNavbarComponent implements OnInit {
     this.role = user.role;
 
     if (this.role === UserRole.client) {
-      this.userService.getUserCart().subscribe(res => this.setCartBadge(res));
+      this.userService.cartObservable.subscribe(res => {
+        if (res) {
+          this.setCartBadge(res);
+        }
+      });
     }
 
     if (this.role === UserRole.admin) {

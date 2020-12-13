@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material';
-import { Router } from '@angular/router';
+import { UserRole } from './models/user.model';
 import { UserService } from './services/user.service';
 
 @Component({
@@ -10,7 +9,12 @@ import { UserService } from './services/user.service';
 })
 export class AppComponent implements OnInit {
 
-  constructor() { }
+  constructor(private userService: UserService) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    const connectedUser = this.userService.getUser();
+    if (connectedUser.role === UserRole.client) {
+      this.userService.retrieveUserCart().subscribe();
+    }
+  }
 }

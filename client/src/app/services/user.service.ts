@@ -89,21 +89,21 @@ export class UserService extends BaseService {
     return user;
   }
 
-  getUserCart(): Observable<any> {
-    const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.USER_CART);
-    const cart = this.cartSubject.getValue();
+  getUserCart(): any {
+    return this.cartSubject.getValue();
+  }
 
-    return cart ? of(cart) : this.http.get(fullEndPoint).pipe(
-      map(
-        results => {
-          this.cartSubject.next(results);
-          return results;
-        })
+  retrieveUserCart(): Observable<any> {
+    const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.USER_CART);
+
+    return this.http.get(fullEndPoint).pipe(
+      map(results => this.cartSubject.next(results),
+      err => console.error(err))
     );
   }
 
-  updateUserCart(cart: any): any {
-    this.cartSubject.next({ cart });
+  updateUserCart(cart: any): void {
+    this.cartSubject.next(cart);
   }
 
   getDecodedToken(): User {
@@ -136,15 +136,7 @@ export class UserService extends BaseService {
 
   removeFromCart(productID: string): Observable<any> {
     const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.UPDATE_CART(productID));
-    // return this.http.delete(fullEndPoint);
-
-    return this.http.delete(fullEndPoint)
-      .pipe(
-        map(
-          res => this.updateUserCart(res),
-          error => console.error('unable to register team member', error)
-        )
-      );
+    return this.http.delete(fullEndPoint);
   }
 
   updateUser(user: User) {

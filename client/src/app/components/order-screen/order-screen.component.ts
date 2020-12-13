@@ -44,9 +44,12 @@ export class OrderScreenComponent implements OnInit {
       data.forEach(date => this.allDupedDates.push(new Date(date)));
     });
 
-    this.userService.getUserCart().subscribe(res => {
+    this.userService.cartObservable.subscribe(res => {
       this.cartToShip = res;
-      this.cartToShip.cartItems.forEach(item => this.totalPrice += item.price);
+
+      if (res) {
+        this.cartToShip.cartItems.forEach(item => this.totalPrice += item.price);
+      }
     });
   }
 
@@ -55,6 +58,7 @@ export class OrderScreenComponent implements OnInit {
   }
 
   myInfo() {
+    console.log("🚀 ~ file: order-screen.component.ts ~ line 61 ~ OrderScreenComponent ~ myInfo ~ myInfo")
     this.userService.getUserDeliveryInfo().subscribe(info => {
       if (info.deliveryInfo !== null) {
         this.shippingGroup = this.formBuilder.group({

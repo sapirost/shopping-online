@@ -2,21 +2,21 @@
   <section class="private-details">
     <a class="startBTN" mat-button routerLink="/shopping">
       <h3 *ngIf="openCart">Resume Shopping</h3>
-      <h3 *ngIf="user?.connect && !openCart && user?.role != 'admin'">Start Shopping</h3>
+      <h3 *ngIf="user && !openCart && user?.role != 'admin'">Start Shopping</h3>
       <h3 *ngIf="user?.role == 'admin'">Shopping Panel</h3>
     </a>
 
-    <h3 *ngIf="!user?.connect">Login</h3>
+    <h3 *ngIf="!user">Login</h3>
   
-    <app-login *ngIf="!user?.connect"></app-login>
-    <div *ngIf="user?.connect && user?.role == 'user'">
+    <app-login *ngIf="!user"></app-login>
+    <div *ngIf="user && user?.role == 'user'">
       <h5>Notification:</h5>
-      <p *ngIf="!lastOrder && !openCart">
+      <p *ngIf="!cartDate && !openCart">
         Welcome To Your First Shopping Experience
       </p>
-      <div *ngIf="lastOrder && !openCart">
+      <div *ngIf="cartDate && !openCart">
         <p>Your Last Order Was At:</p>
-        <p>{{ lastOrder }}</p>
+        <p>{{ cartDate }}</p>
       </div>
       <div *ngIf="openCart">
         <p>You Have An Open Cart from:</p>
