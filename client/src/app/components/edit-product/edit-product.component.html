@@ -1,41 +1,33 @@
-<section class="CreatePatient" *ngIf="addProductForm">
-  <form
-    *ngIf="addProductForm"
-    (ngSubmit)="addProduct()"
-    id="addProductForm"
-    [formGroup]="addProductForm"
-  >
-    <p>
-      <mat-form-field>
-        <mat-label>Name</mat-label>
-        <input matInput formControlName="name" name="name" autocomplete="off" />
-      </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field class="blocked-fields">
-        <mat-label>Choose Category</mat-label>
-        <mat-select formControlName="category" name="category">
-          <mat-option *ngFor="let c of allCategories" [value]="c._id">
-            {{ c.name }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field class="price-input">
-        <input
-          matInput
-          placeholder="price"
-          name="price"
-          type="number"
-          class="example-right-align"
-          formControlName="price"
-          autocomplete="off"
-        />
-        <span matPrefix>$&nbsp;</span>
-      </mat-form-field>
-    </p>
-    <p>
+<section *ngIf="addProductForm" class="edit-wrapper">
+  <form (ngSubmit)="addProduct()" [formGroup]="addProductForm">
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" name="name" autocomplete="off" />
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Choose Category</mat-label>
+      <mat-select formControlName="category" name="category">
+        <mat-option *ngFor="let c of allCategories" [value]="c._id">
+          {{ c.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="price-input">
+      <input
+        matInput
+        placeholder="price"
+        name="price"
+        type="number"
+        class="example-right-align"
+        formControlName="price"
+        autocomplete="off"
+      />
+      <span matPrefix>$&nbsp;</span>
+    </mat-form-field>
+
+    <div>
       <label class="file-label">Select Image</label>
       <input
         style="display: none"
@@ -49,12 +41,17 @@
       <button mat-button mat-mini-fab type="button" (click)="fileInput.click()">
         <mat-icon>attachment</mat-icon>
       </button>
-    </p>
-    <p *ngIf="imgUrl.length > 0"><img class="show-img" [src]="imgUrl" /></p>
+    </div>
+
+    <img [src]="imgUrl || '../assets/img/placeholder-image.png'" />
+
     <mat-error *ngIf="addProductForm.touched && !addProductForm.valid">
       All Fields Are Required
     </mat-error>
     <mat-error *ngIf="imgError"> Image Was Not Selected </mat-error>
+
+    <div class="spacer"></div>
+
     <div mat-dialog-actions>
       <button mat-button type="button" (click)="cleanForm()">CANCEL</button>
       <button *ngIf="!editMode" type="submit" mat-button>ADD</button>

@@ -1,7 +1,5 @@
-@import url("https://fonts.googleapis.com/css?family=Poppins|Quicksand");
+@import './assets/scss/variables.scss';
 @import '~@angular/material/theming';
-
-$font: "Poppins", sans-serif;
 
 $custom-typography: mat-typography-config(
 	$font-family: $font,
@@ -87,5 +85,5 @@ body {
 }
 
 .spacer {
-  flex: 1 4 auto;
+	flex-grow: 1;
 }

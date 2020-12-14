@@ -1,7 +1,10 @@
+import { Observable, of, Subject, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { BaseService } from './base-service';
+import { Order } from '../models/order.model';
+import { Category } from '../models/product.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +14,9 @@ export class StoreService extends BaseService {
 
   refreshProdsEm: EventEmitter<string> = new EventEmitter();
   editModeEvnt: EventEmitter<string> = new EventEmitter();
+
+  private categoriesSubject = new Subject<Category[]>();
+  categoriesObservable = this.categoriesSubject.asObservable();
 
   private endPoints = {
     ALL_PRODUCTS: '/all',
@@ -39,12 +45,16 @@ export class StoreService extends BaseService {
 
   getAllCategories(): Observable<any> {
     const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.GET_CATEGORIES);
-    return this.http.get(fullEndPoint);
+
+    return this.http.get(fullEndPoint).pipe(
+      map((results: any) => this.categoriesSubject.next(results)),
+      catchError(err => throwError(err))
+    );
   }
 
-  addNewProduct(productObj: any): Observable<any> {
+  addNewProduct(product: FormData): Observable<any> {
     const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.ADD_PRODUCT);
-    return this.http.post(fullEndPoint, productObj);
+    return this.http.post(fullEndPoint, product);
   }
 
   getAllProducts(): Observable<any> {
@@ -52,7 +62,7 @@ export class StoreService extends BaseService {
     return this.http.get(fullEndPoint);
   }
 
-  findProduct({ searchText }: any): Observable<any> {
+  findProduct(searchText: string): Observable<any> {
     const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.FIND_PRODUCT(searchText));
     return this.http.get(fullEndPoint);
   }
@@ -72,9 +82,9 @@ export class StoreService extends BaseService {
     return this.http.get(fullEndPoint);
   }
 
-  updateProduct(id: string, productObj: any): Observable<any> {
+  updateProduct(id: string, product: FormData): Observable<any> {
     const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.PRODUCT_BY_ID(id));
-    return this.http.put(fullEndPoint, productObj);
+    return this.http.put(fullEndPoint, product);
   }
 
   unavailableDates(): Observable<any> {
@@ -82,9 +92,9 @@ export class StoreService extends BaseService {
     return this.http.get(fullEndPoint);
   }
 
-  sendOrder(orderObj: any): Observable<any> {
+  sendOrder(order: Order): Observable<any> {
     const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.SEND_ORDER);
-    return this.http.post(fullEndPoint, orderObj);
+    return this.http.post(fullEndPoint, order);
   }
 
   getProductsByCategory(id: string): Observable<any> {

@@ -1,5 +1,15 @@
-#addProductForm {
-    text-align: center;
+@import "../../../assets/scss/variables.scss";
+
+.edit-wrapper {
+    height: calc(100% - #{$products-navbar-height} - 10px);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    align-items: center;
+    padding-top: 10px;
 
     .mat-dialog-actions {
         justify-content: center;
@@ -13,9 +23,10 @@
         color: red;
     }
 
-    .show-img {
+    img {
         height: 70px;
-        width: 60px;
+        width: 70px;
+        margin: 10px auto;
     }
 
     .file-label {
@@ -26,7 +37,9 @@
     .mat-mini-fab.mat-accent {
         background-color: #3f51b5;
         &:hover {
-            .mat-icon {text-shadow: 0 0 3px #ffffff5c;}
+            .mat-icon {
+                text-shadow: 0 0 3px #ffffff5c;
+            }
         }
     }
 }

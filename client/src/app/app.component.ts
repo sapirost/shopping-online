@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UserRole } from './models/user.model';
+import { UserRole, User } from './models/user.model';
 import { UserService } from './services/user.service';
 
 @Component({
@@ -13,7 +13,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     const connectedUser = this.userService.getUser();
-    if (connectedUser.role === UserRole.client) {
+    if (connectedUser && connectedUser.role === UserRole.client) {
       this.userService.retrieveUserCart().subscribe();
     }
   }

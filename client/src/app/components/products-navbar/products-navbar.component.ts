@@ -1,3 +1,6 @@
+import { Category } from './../../models/product.model';
+import { Cart } from './../../models/cart.model';
+import { isEmpty } from 'lodash';
 import { UserRole } from './../../models/user.model';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, OnInit, ViewChild } from '@angular/core';
@@ -15,7 +18,7 @@ import { UserService } from './../../services/user.service';
 })
 export class ProductsNavbarComponent implements OnInit {
   @ViewChild('drawer', { static: false }) public myNav: MatSidenav;
-  allCategories: [] = [];
+  allCategories: Category[];
   cartBadge = 0;
   role: UserRole;
   searchControl = new FormControl('');
@@ -32,7 +35,7 @@ export class ProductsNavbarComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.getAllCategories();
+    this.storeService.categoriesObservable.subscribe(categories => this.allCategories = categories);
     this.subscribeFilterChanges();
 
     const user = this.userService.getUser();
@@ -60,25 +63,17 @@ export class ProductsNavbarComponent implements OnInit {
       debounceTime(1000),
       distinctUntilChanged())
       .subscribe(searchText => {
-        let products;
-
-        if (searchText === '') {
-          this.storeService.getAllProducts().subscribe(response => products = response);
+        if (isEmpty(searchText)) {
+          this.storeService.getAllProducts().subscribe(products => this.storeService.refreshProdsEm.emit(products));
         } else {
-          this.storeService.findProduct(searchText).subscribe(response => products = response);
+          this.storeService.findProduct(searchText).subscribe(products => this.storeService.refreshProdsEm.emit(products));
         }
-
-        this.storeService.refreshProdsEm.emit(products);
       });
   }
 
-  setCartBadge(cart: any) {
+  setCartBadge(cart: Cart) {
     this.cartBadge = 0;
     cart.items.forEach(c => this.cartBadge += c.quantity);
-  }
-
-  getAllCategories() {
-    this.storeService.getAllCategories().subscribe(categories => this.allCategories = categories);
   }
 
   // Event Emitter for changing the product's display

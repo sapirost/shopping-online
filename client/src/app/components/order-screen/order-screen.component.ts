@@ -1,3 +1,4 @@
+import { Cart } from './../../models/cart.model';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatSnackBar } from '@angular/material';
@@ -13,7 +14,7 @@ import { UserService } from './../../services/user.service';
 })
 export class OrderScreenComponent implements OnInit {
   minDate = new Date();
-  cartToShip: any;
+  cartToShip: Cart;
   totalPrice = 0;
   allDupedDates = [];
 
@@ -40,15 +41,15 @@ export class OrderScreenComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.storeService.unavailableDates().subscribe(data => {
-      data.forEach(date => this.allDupedDates.push(new Date(date)));
+    this.storeService.unavailableDates().subscribe(dates => {
+      dates.forEach(date => this.allDupedDates.push(new Date(date)));
     });
 
     this.userService.cartObservable.subscribe(res => {
       this.cartToShip = res;
 
-      if (res) {
-        this.cartToShip.cartItems.forEach(item => this.totalPrice += item.price);
+      if (this.cartToShip && this.cartToShip.items) {
+        this.cartToShip.items.forEach(item => this.totalPrice += item.price);
       }
     });
   }
@@ -93,7 +94,7 @@ export class OrderScreenComponent implements OnInit {
   openDialog(): void {
     this.dialog.open(ReceiptPopupComponent, {
       width: '270px',
-      data: { myCart: this.cartToShip.cartItems, totalPrice: this.totalPrice }
+      data: { ...this.cartToShip, totalPrice: this.totalPrice }
     });
   }
 }

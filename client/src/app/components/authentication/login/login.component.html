@@ -1,11 +1,8 @@
 <form [formGroup]="logGroup">
   <mat-form-field>
-    <input
-      matInput
-      placeholder="Username (Email)"
-      formControlName="email"
-    />
+    <input matInput placeholder="Username (Email)" formControlName="email" />
   </mat-form-field>
+
   <br />
   <mat-form-field>
     <input
@@ -15,6 +12,7 @@
       formControlName="password"
     />
   </mat-form-field>
+
   <br />
   <div>
     <button mat-button (click)="login()" [disabled]="logGroup.invalid">

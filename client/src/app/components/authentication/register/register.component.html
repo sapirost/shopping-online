@@ -14,6 +14,7 @@
           {{ getErrorMessage() }}
         </mat-error>
       </mat-form-field>
+
       <br />
       <mat-form-field>
         <input
@@ -26,6 +27,7 @@
           Invalid Email
         </mat-error>
       </mat-form-field>
+
       <br />
       <mat-form-field>
         <input
@@ -35,6 +37,7 @@
           formControlName="password"
         />
       </mat-form-field>
+
       <br />
       <mat-form-field>
         <input
@@ -50,12 +53,14 @@
           Passwords do not match!
         </mat-error>
       </mat-form-field>
+
       <br />
       <div>
         <button mat-button matStepperNext>Next</button>
       </div>
     </form>
   </mat-step>
+
   <mat-step [stepControl]="secondRegisterGroup">
     <form [formGroup]="secondRegisterGroup">
       <ng-template matStepLabel>Second Step</ng-template>
@@ -67,6 +72,7 @@
           autocomplete="off"
         />
       </mat-form-field>
+
       <br />
       <mat-form-field>
         <input
@@ -76,6 +82,7 @@
           autocomplete="off"
         />
       </mat-form-field>
+
       <br />
       <mat-form-field>
         <mat-label>City</mat-label>
@@ -92,6 +99,7 @@
           <mat-option value="Rishon-LeZion">Rishon-LeZion</mat-option>
         </mat-select>
       </mat-form-field>
+
       <br />
       <mat-form-field>
         <input
@@ -101,12 +109,14 @@
           autocomplete="off"
         />
       </mat-form-field>
+
       <div>
         <button mat-button matStepperPrevious>Back</button>
         <button mat-button matStepperNext>Next</button>
       </div>
     </form>
   </mat-step>
+
   <mat-step>
     <div class="step-wrapper">
       <ng-template matStepLabel>Done</ng-template>

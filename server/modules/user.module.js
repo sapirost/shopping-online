@@ -17,18 +17,18 @@ module.exports = {
             const user = await UserModel.findOne({ email });
 
             if (!user) {
-                reject({ message: 'user does not exist' })
+                return reject({ message: 'user does not exist' })
             }
 
             const isPasswordMatch = await bcrypt.compare(password, user.password);
 
             if (!isPasswordMatch) {
-                reject({ message: 'user does not exist' })
+                return reject({ message: 'user does not exist' })
             }
 
             const body = { _id: user._id, firstName: user.firstName, role: user.role };
             const token = jwt.sign(body, config.Authentication.jwtAppSecret);
-            resolve({ token });
+            resolve(token);
         })
     },
 

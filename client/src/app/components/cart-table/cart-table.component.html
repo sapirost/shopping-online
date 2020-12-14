@@ -9,6 +9,7 @@
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
 </div>
+
 <div class="cart-table">
   <table
     mat-table
@@ -54,11 +55,11 @@
 
 <div class="total-price" id="total-price">
   <div>Total $ {{ totalPrice }}</div>
-  <button
+  <a
     *ngIf="dataSource?.data?.length > 0 && !orderMode"
     mat-button
-    (click)="payment()"
+    routerLink="/payment"
   >
     Payment
-  </button>
+</a>
 </div>

@@ -1,3 +1,5 @@
+@import '../../../assets/scss/variables.scss';
+
 .sidenav-container {
     background: #fafafa!important; 
   }
@@ -16,6 +18,10 @@
     border-bottom: 1px solid #54548c;
     border-top: 1px solid #54548c;
     padding-top: 15px;
+  }
+
+  .mat-toolbar {
+    height: $products-navbar-height;
   }
   
   .sidenav .mat-toolbar label {
@@ -80,7 +86,7 @@
   app-cart-table {
     display: flex;
     flex-direction: column;
-    height: calc(100% - 65px)!important;
+    height: calc(100% - #{$products-navbar-height})!important;
     overflow-x: hidden;
   }
   

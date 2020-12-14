@@ -1,21 +1,21 @@
-var CategoryModel = require('../models/categoryModel');
-var ProdModel = require('../models/prodModel');
-var OrderModel = require('../models/orderModel');
-var CartModel = require('../models/cartModel');
+const CategoryModel = require('../models/categoryModel');
+const ProdModel = require('../models/prodModel');
+const OrderModel = require('../models/orderModel');
+const CartModel = require('../models/cartModel');
 
-var storeModule = {
+const storeModule = {
 
     insertAllCategories: function () {
         return new Promise(async (resolve, reject) => {
-            var c1 = new CategoryModel({ name: "Milk & Eggs" });
+            const c1 = new CategoryModel({ name: "Milk & Eggs" });
             await c1.save();
-            var c2 = new CategoryModel({ name: "Vegetables & Fruits" });
+            const c2 = new CategoryModel({ name: "Vegetables & Fruits" });
             await c2.save();
-            var c3 = new CategoryModel({ name: "Meat & Fish" });
+            const c3 = new CategoryModel({ name: "Meat & Fish" });
             await c3.save();
-            var c4 = new CategoryModel({ name: "Wine & Drinks" });
+            const c4 = new CategoryModel({ name: "Wine & Drinks" });
             await c4.save();
-            var categoriesData = await this.getAllCategories();
+            const categoriesData = await this.getAllCategories();
             resolve(categoriesData);
             reject('err')
         });
@@ -27,9 +27,9 @@ var storeModule = {
 
     addNewProduct: function (name, price, category, image) {
         return new Promise(async (resolve, reject) => {
-            var newProd = new ProdModel({ name: name, price: price, category: category, image: image });
+            const newProd = new ProdModel({ name: name, price: price, category: category, image: image });
             await newProd.save();
-            var updatedProds = await this.getAllProducts();
+            const updatedProds = await this.getAllProducts();
             resolve(updatedProds);
             reject({ msg: 'failed' });
         });
@@ -92,8 +92,8 @@ var storeModule = {
             .catch(err => { return err; });
     },
 
-    getProductsFromCategory: function(id) {
-        return ProdModel.find({category: id})
+    getProductsFromCategory: function (id) {
+        return ProdModel.find({ category: id })
             .populate('category')
             .exec()
             .then(docs => {
@@ -114,19 +114,19 @@ var storeModule = {
 
 
     getGeneralInfo: async function () {
-        var prods = await ProdModel.count();
-        var orders = await OrderModel.count();
+        const prods = await ProdModel.count();
+        const orders = await OrderModel.count();
         return { products: prods, orders: orders }
     },
 
     checkCartStatus: async function (user) {
-        var carts = await CartModel.find({ user: user });
+        const carts = await CartModel.find({ user: user });
         if (carts !== undefined && carts.length > 0) {
-            var openCart = carts.filter(function (e) { return e.status == 'open'; });
+            const openCart = carts.filter(function (e) { return e.status == 'open'; });
             if (openCart.length > 0) {
                 return { cartStatus: 'open', myCart: openCart };
             } else {
-                var latestCart = await OrderModel.findOne({ 'cart._id': carts[carts.length - 1].id });
+                const latestCart = await OrderModel.findOne({ 'cart._id': carts[carts.length - 1].id });
                 return { cartStatus: 'close', lastOrder: latestCart.orderDate };
             }
         }
@@ -135,19 +135,19 @@ var storeModule = {
 
     deleteProduct: async function (id) {
         await ProdModel.findByIdAndDelete(id);
-        var updatedProds = await this.getAllProducts();
+        const updatedProds = await this.getAllProducts();
         return updatedProds;
     },
 
     updateProductById: async function (id, productOBJ) {
         await ProdModel.findOneAndUpdate({ "_id": id }, productOBJ);
-        var updatedProds = await this.getAllProducts();
+        const updatedProds = await this.getAllProducts();
         return updatedProds;
     },
 
     unavailableDates: async function () {
-        var unavailableArr = [];
-        var allOrders = await OrderModel.find();
+        const unavailableArr = [];
+        const allOrders = await OrderModel.find();
         if (Array.isArray(allOrders)) {
             allOrders.forEach(element => {
                 let counter = 0;
@@ -162,7 +162,7 @@ var storeModule = {
 
     submitOrder: function (orderOBJ, userID) {
         return new Promise(async (resolve, reject) => {
-            var newOrder = new OrderModel(Object.assign(orderOBJ, { user: userID }));
+            const newOrder = new OrderModel(Object.assign(orderOBJ, { user: userID }));
             await newOrder.save();
             await CartModel.findOneAndUpdate({ 'user': userID, status: 'open' },
                 { "$set": { "status": "close" } }, { safe: true, multi: true });

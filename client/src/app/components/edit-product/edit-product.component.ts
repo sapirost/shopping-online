@@ -1,7 +1,9 @@
+import { Category, Product } from './../../models/product.model';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import { StoreService } from './../../services/store.service';
+import { get } from 'lodash';
 
 @Component({
   selector: 'app-edit-product',
@@ -9,7 +11,7 @@ import { StoreService } from './../../services/store.service';
   styleUrls: ['./edit-product.component.scss']
 })
 export class EditProductComponent implements OnInit {
-  allCategories: any;
+  allCategories: Category[];
   formData: FormData;
   selectedFile: File | null = null;
   imgError = false;
@@ -17,34 +19,31 @@ export class EditProductComponent implements OnInit {
   editMode = false;
   productID: string;
 
-  addProductForm: FormGroup = this.formBuilder.group({
-    name: new FormControl('', [Validators.required]),
-    category: new FormControl(Validators.required),
-    price: new FormControl('', Validators.required)
-  });
+  addProductForm: FormGroup;
 
   constructor(private storeService: StoreService, private formBuilder: FormBuilder, private snackBar: MatSnackBar) { }
 
   ngOnInit() {
-    this.storeService.getAllCategories().subscribe(categoriesData => {
-      this.allCategories = categoriesData;
-    });
+    this.setProductForm();
+    this.storeService.categoriesObservable.subscribe(categories => this.allCategories = categories);
 
     this.storeService.editModeEvnt.subscribe(data => {
       this.productID = data;
-      this.storeService.getProductById(data).subscribe(details => { this.getProductById(details); });
+      this.storeService.getProductById(data).subscribe(product => this.setProductForm(product));
     });
   }
 
-  getProductById(productOBJ) {
+  private setProductForm(product?: Product) {
     this.addProductForm = this.formBuilder.group({
-      name: new FormControl(productOBJ.name, [Validators.required]),
-      category: new FormControl(productOBJ.categoryID, Validators.required),
-      price: new FormControl(productOBJ.price, Validators.required)
+      name: new FormControl(get(product, 'name'), [Validators.required]),
+      category: new FormControl(get(product, 'categoryID'), Validators.required),
+      price: new FormControl(get(product, 'price'), Validators.required)
     });
 
-    this.imgUrl = this.storeService.getProductImageLink(productOBJ.image);
-    this.editMode = true;
+    if (product) {
+      this.imgUrl = this.storeService.getProductImageLink(product.image);
+      this.editMode = true;
+    }
   }
 
   onFileChanged(event) {
@@ -75,7 +74,7 @@ export class EditProductComponent implements OnInit {
           this.cleanForm();
           this.storeService.refreshProdsEm.emit(response);
         },
-          err => this.snackBar.open('something went wrong! please try again...'));
+          () => this.snackBar.open('something went wrong! please try again...'));
       }
 
       if (this.editMode && (this.addProductForm.dirty || this.selectedFile !== null)) {
@@ -83,7 +82,7 @@ export class EditProductComponent implements OnInit {
           this.cleanForm();
           this.storeService.refreshProdsEm.emit(response);
         },
-          err => this.snackBar.open('something went wrong! please try again...'));
+          () => this.snackBar.open('something went wrong! please try again...'));
       }
 
       if (!this.addProductForm.dirty && this.editMode && this.selectedFile === null) {
@@ -98,10 +97,6 @@ export class EditProductComponent implements OnInit {
     this.imgUrl = '';
     this.editMode = false;
     this.productID = '';
-    this.addProductForm = this.formBuilder.group({
-      name: new FormControl('', [Validators.required]),
-      category: new FormControl(Validators.required),
-      price: new FormControl('', Validators.required)
-    });
+    this.addProductForm.reset();
   }
 }

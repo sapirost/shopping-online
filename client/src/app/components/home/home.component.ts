@@ -1,3 +1,4 @@
+import { StoreService } from 'src/app/services/store.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -7,7 +8,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-  constructor() { }
+  constructor(private storeService: StoreService) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.storeService.getAllCategories().subscribe();
+  }
 }

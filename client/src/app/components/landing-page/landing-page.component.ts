@@ -11,15 +11,12 @@ import { UserService } from './../../services/user.service';
 export class LandingPageComponent implements OnInit {
   prodsAmount: number;
   ordersAmount: number;
-  cartDate: any;
-  lastOrder: any;
+  cartDate: string;
+  lastOrder: string;
   openCart = false;
   user: User;
 
-  constructor(
-    private storeService: StoreService,
-    private userService: UserService,
-  ) { }
+  constructor(private storeService: StoreService, private userService: UserService) { }
 
   ngOnInit() {
     this.getStoreInformation();

@@ -4,9 +4,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { BaseService } from './base-service';
+import { Cart } from '../models/cart.model';
 
 @Injectable({
   providedIn: 'root'
@@ -18,14 +19,13 @@ export class UserService extends BaseService {
   private userSubject = new BehaviorSubject<User | null>(null);
   userObservable = this.userSubject.asObservable();
 
-  private cartSubject = new BehaviorSubject<any>(null);
+  private cartSubject = new BehaviorSubject<Cart | null>(null);
   cartObservable = this.cartSubject.asObservable();
 
   private endPoints = {
     REGISTER: '/register',
     LOGIN: `/login`,
     DELIVERY_USER_INFO: `/delivery-user-info`,
-    CHECK_USER_ID: `/check-user`,
     USER_CART: `/cart`,
     UPDATE_CART: (productId: string) => {
       return `/${productId}`;
@@ -54,7 +54,7 @@ export class UserService extends BaseService {
     );
   }
 
-  logUser(user: User): Observable<User> {
+  logUser(user: User): Observable<void> {
     const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.LOGIN);
 
     return this.http.post(fullEndPoint, user).pipe(
@@ -63,18 +63,14 @@ export class UserService extends BaseService {
           localStorage.setItem('token', results.token);
           const decodedUser = this.getDecodedToken();
           this.updateUser(decodedUser);
-          return decodedUser;
-        },
-        err => {
-          const errMessage = err.error === 'Unauthorized' ? 'user does not exist' : 'something went wrong, please try again';
-          this.snackBar.open(errMessage);
-        })
-    );
-  }
+        }),
+      catchError(err => {
+        const errMessage = err.status === 401 ? 'user does not exist' : 'something went wrong, please try again';
+        this.snackBar.open(errMessage);
 
-  checkUserID(): Observable<any> {
-    const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.CHECK_USER_ID);
-    return this.http.post(fullEndPoint, {});
+        return throwError(err);
+      })
+    );
   }
 
   getUser(): User {
@@ -89,20 +85,20 @@ export class UserService extends BaseService {
     return user;
   }
 
-  getUserCart(): any {
+  getUserCart(): Cart {
     return this.cartSubject.getValue();
   }
 
-  retrieveUserCart(): Observable<any> {
+  retrieveUserCart(): Observable<Cart | void> {
     const fullEndPoint = this.buildFullEndPoint(this.BASE_SERVICE_URL, this.endPoints.USER_CART);
 
     return this.http.get(fullEndPoint).pipe(
-      map(results => this.cartSubject.next(results),
-      err => console.error(err))
+      map((results: Cart) => this.cartSubject.next(results),
+        err => console.error(err))
     );
   }
 
-  updateUserCart(cart: any): void {
+  updateUserCart(cart: Cart): void {
     this.cartSubject.next(cart);
   }
 

@@ -2,9 +2,6 @@ const express = require('express');
 const router = express.Router();
 const userModule = require('../modules/user.module');
 const passport = require('passport');
-// const bcrypt = require('bcryptjs');
-// const saltRounds = 8;
-// const UserModel = require('../models/userModel');
 const auth = require('../middleware/authentication');
 
 // Create app's admin
@@ -23,46 +20,67 @@ const auth = require('../middleware/authentication');
 // });
 
 router.post('/register', passport.authenticate('local-register'), async (req, res) => {
+  try {
+    const token = await userModule.register(req.body);
+
+    res.json({ token });
+  } catch (error) {
+    res.status(401).json(error);
+  }
+
+
   const token = userModule.getUserToken(req.user, null);
   res.json({ token });
 });
 
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  const user = await userModule.login(email, password)
+  try {
+    const { email, password } = req.body;
+    const token = await userModule.login(email, password);
 
-  let cart;
-  if (user.role == 'user') {
-      cart = await userModule.getCart(user._id);
+    res.json({ token });
+  } catch (error) {
+    res.status(401).json(error);
   }
-
-  const token = userModule.getUserToken(user, cart);
-  res.json({token});
 });
 
 router.get('/cart', auth, async (req, res) => {
-  const cart = await userModule.getCart(req.user._id);
+  try {
+    const cart = await userModule.getCart(req.user._id);
 
-  res.json(cart);
+    res.json(cart);
+  } catch (error) {
+    res.json(error);
+  }
 })
 
 router.put('/:id', auth, async (req, res, next) => {
-  var result = await userModule.addToCart(req.user._id, req.params.id, req.body.quantity);
-  res.json(result);
+  try {
+    const result = await userModule.addToCart(req.user._id, req.params.id, req.body.quantity);
+
+    res.json(result);
+  } catch (error) {
+    res.json(error);
+  }
 });
 
 router.delete('/:id', auth, async (req, res, next) => {
-  var result = await userModule.removeFromCart(req.user._id, req.params.id);
-  res.json(result);
+  try {
+    const result = await userModule.removeFromCart(req.user._id, req.params.id);
+
+    res.json(result);
+  } catch (error) {
+    res.json(error);
+  }
 });
 
 router.get('/delivery-user-info', auth, async (req, res) => {
-  const user = await userModule.findUserById(req.user._id);
+  try {
+    const user = await userModule.findUserById(req.user._id);
 
-  if (user) {
     res.json({ deliveryInfo: { city: user.city, street: user.street } });
-  } else {
-    res.json({ deliveryInfo: null });
+  } catch (error) {
+    res.json(error);
   }
 })
 
